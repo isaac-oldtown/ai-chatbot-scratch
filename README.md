@@ -1,6 +1,3 @@
-## 🎯 Overview  
-A sleek AI chatbot interface crafted for hands-on learning and exploration.
-
 ## 🏗️ Tech Stack
 **Backend:**
 - Python >= 3.11
