@@ -2,30 +2,46 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AI ChatBot Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat Assistant</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="chat.js"></script>
 </head>
 <body>
-    <!-- Main Content -->
-    <div class="main-content">
-        
-        <!-- Chat Interface -->
-        <div class="chat-container">
-            <div class="chat-header">
-                <span>Client: "Acme Corp" (temp title)</span>
-                <button onclick="clearChat()" style="font-size: 0.8rem; padding: 5px 10px;">Reset Chat</button>
-            </div>
-            <div class="messages-area" id="messagesArea">
-                <div class="message bot">
-                    Default message (to change for GPT one)
-                </div>
-            </div>
-            <div class="input-area">
-                <input type="text" id="userInput" placeholder="Type your question..." onkeypress="handleEnter(event)">
-                <button onclick="sendMessage()">Send</button>
+    <div class="container">
+        <div id="chatContainer" class="chat-container">
+            <div id="chatHistory" class="chat-history"></div>
+            <div id="inputContainer" class="input-container">
+                <input type="text" id="userInput" placeholder="Type your message here...">
+                <button id="sendButton">Send</button>
+                <button id="clearButton">Clear Chat</button>
             </div>
         </div>
+        <div id="tutorialPanel" class="tutorial-panel">
+            <div class="tutorial-header">
+                <h3>AI Chat Assistant Tutorial</h3>
+                <button id="closePanel" class="close-btn">&times;</button>
+            </div>
+            <div class="tutorial-content">
+                <h4>How to Use This Chat Assistant</h4>
+                <ul>
+                    <li>Simply type your question in the input field below</li>
+                    <li>Press Enter or click Send to submit your message</li>
+                    <li>Wait for the AI response to appear in the chat area</li>
+                    <li>Use the <strong>Clear Chat</strong> button to start a new conversation</li>
+                    <li>Try asking about programming, science, or any other topic!</li>
+                </ul>
+                <h4>Features</h4>
+                <ul>
+                    <li>Real-time chat responses</li>
+                    <li>Conversation history</li>
+                    <li>Easy clearing of chat history</li>
+                    <li>Responsive design</li>
+                </ul>
+                <p>Enjoy chatting with your AI assistant!</p>
+            </div>
+        </div>
+        <div id="togglePanel" class="toggle-btn">?</div>
     </div>
+    <script src="chat.js"></script>
 </body>
 </html>

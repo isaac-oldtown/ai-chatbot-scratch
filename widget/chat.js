@@ -1,101 +1,94 @@
 const API_URL = "http://127.0.0.1:8000/api";
 
-function addMessage(role, text, animate = false) {
-    const area = document.getElementById("messagesArea");
+document.addEventListener('DOMContentLoaded', function() {
+    const chatHistory = document.getElementById('chatHistory');
+    const userInput = document.getElementById('userInput');
+    const sendButton = document.getElementById('sendButton');
+    const clearButton = document.getElementById('clearButton');
+    const tutorialPanel = document.getElementById('tutorialPanel');
+    const togglePanel = document.getElementById('togglePanel');
+    const closePanel = document.getElementById('closePanel');
 
-    const msg = document.createElement("div");
-    msg.classList.add("message", role);
-
-    if (animate) {
-        msg.classList.add("typing");
-        msg.innerText = "Typing...";
-        area.appendChild(msg);
-
-        setTimeout(() => {
-            msg.classList.remove("typing");
-            msg.innerText = text;
-        }, 600);
-    } else {
-        msg.innerText = text;
-        area.appendChild(msg);
+    // Function to add a message to the chat
+    function addMessage(message, isUser = false) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.classList.add(isUser ? 'user-message' : 'ai-message');
+        messageElement.textContent = message;
+        chatHistory.appendChild(messageElement);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
-    area.scrollTop = area.scrollHeight;
-}
-
-async function sendMessage() {
-    const input = document.getElementById("userInput");
-    const text = input.value.trim();
-
-    if (!text) return;
-
-    // show user message immediately
-    createMessage("user", text);
-    input.value = "";
-
-    // typing indicator
-    const typing = document.createElement("div");
-    typing.classList.add("message", "bot");
-    typing.innerText = "Typing...";
-    document.getElementById("messagesArea").appendChild(typing);
-
-    try {
-        const res = await fetch(`${API_URL}/messages/send`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ message: text })
-        });
-
-        const data = await res.json();
-
-        // remove typing indicator
-        typing.remove();
-
-        // show bot response
-        createMessage("bot", data.reply);
-
-    } catch (err) {
-        typing.remove();
-        createMessage("bot", "Error connecting to server ❌");
+    // Function to handle sending a message
+    async function sendMessage() {
+        const message = userInput.value.trim();
+        if (message) {
+            addMessage(message, true);
+            userInput.value = '';
+            
+            // Show typing indicator
+            const typingIndicator = document.createElement('div');
+            typingIndicator.classList.add('message', 'ai-message');
+            typingIndicator.textContent = 'AI is typing. ..';
+            typingIndicator.id = 'typingIndicator';
+            chatHistory.appendChild(typingIndicator);
+            chatHistory.scrollTop = chatHistory.scrollHeight;
+            
+            try {
+                // Send to cloud API using async/await
+                const response = await fetch(`${API_URL}/messages/send`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: message })
+                });
+                
+                const data = await response.json();
+                chatHistory.removeChild(typingIndicator);
+                
+                // Fixed: use 'reply' instead of 'response' to match your working FastAPI code
+                if (data && typeof data === 'object' && data.reply) {
+                    addMessage(data.reply, false);
+                } else {
+                    // Fallback for different response structures
+                    const responseText = data.reply || data.response || data.message || data.text || JSON.stringify(data);
+                    addMessage(responseText, false);
+                }
+            } catch (error) {
+                chatHistory.removeChild(typingIndicator);
+                addMessage("Sorry, I encountered an error. Please try again.", false);
+                console.error('Error:', error);
+            }
+        }
     }
-}
 
-async function clearChat() {
-    await fetch(`${API_URL}/messages/reset`, {
-        method: "DELETE"
+    // Event listeners
+    sendButton.addEventListener('click', sendMessage);
+    
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
     });
 
-    loadMessages();
-}
-
-function handleEnter(event) {
-    if (event.key === "Enter") {
-        sendMessage();
-    }
-}
-
-function createMessage(role, text) {
-    const area = document.getElementById("messagesArea");
-
-    const div = document.createElement("div");
-    div.classList.add("message", role);
-    div.innerText = text;
-
-    area.appendChild(div);
-    area.scrollTop = area.scrollHeight;
-}
-
-async function loadMessages() {
-    const res = await fetch(`${API_URL}/messages`);
-    const data = await res.json();
-
-    const area = document.getElementById("messagesArea");
-    area.innerHTML = "";
-
-    data.forEach(msg => {
-        createMessage(msg.role, msg.text);
+    clearButton.addEventListener('click', function() {
+        chatHistory.innerHTML = '';
     });
-}
 
+    // Tutorial panel toggle functionality
+    togglePanel.addEventListener('click', function() {
+        tutorialPanel.classList.toggle('active');
+        togglePanel.textContent = tutorialPanel.classList.contains('active') ? '×' : '?';
+    });
+
+    closePanel.addEventListener('click', function() {
+        tutorialPanel.classList.remove('active');
+        togglePanel.textContent = '?';
+    });
+
+    // Add initial welcome message
+    setTimeout(() => {
+        addMessage("Hello! I'm your AI assistant. How can I help you today?", false);
+    }, 500);
+});
