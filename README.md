@@ -42,7 +42,7 @@ cd ai-chatbot
 # Install Python dependencies
 uv sync
 # Run backend server
-uv run uvicorn backend.main:app --reload
+uv run python -m uvicorn backend.main:app --reload
 
 # Access frontend
 # Open widget/index.html in browser
