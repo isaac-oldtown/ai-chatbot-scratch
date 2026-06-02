@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>AI ChatBot Demo</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="chat.js"></script>
+</head>
+<body>
+    <!-- Main Content -->
+    <div class="main-content">
+        
+        <!-- Chat Interface -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <span>Client: "Acme Corp" (temp title)</span>
+                <button onclick="clearChat()" style="font-size: 0.8rem; padding: 5px 10px;">Reset Chat</button>
+            </div>
+            <div class="messages-area" id="messagesArea">
+                <div class="message bot">
+                    Default message (to change for GPT one)
+                </div>
+            </div>
+            <div class="input-area">
+                <input type="text" id="userInput" placeholder="Type your question..." onkeypress="handleEnter(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
