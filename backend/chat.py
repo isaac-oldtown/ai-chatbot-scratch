@@ -16,30 +16,34 @@ initial_message=[
 messages = initial_message
 
 def generate_reply(user_text: str):
-    url = "https://openrouter.ai/api/v1/chat/completions"
+    if os.getenv('APP_ENV')=='prod':
+        url = "https://openrouter.ai/api/v1/chat/completions"
 
-    headers = {
-        "Authorization": f"Bearer {OPENAI_KEY}",
-        "Content-Type": "application/json",
-    }
+        headers = {
+            "Authorization": f"Bearer {OPENAI_KEY}",
+            "Content-Type": "application/json",
+        }
 
-    data = json.dumps({
-        "model": "openai/gpt-oss-20b:free",
-        "messages": [
-            {"role": "system", "content": "You are a helpful assistant for a chatbot MVP. Make short and helpful answers."},
-            {"role": "user", "content": user_text}
-        ],
-        "temperature": 0.7
-    })
+        data = json.dumps({
+            "model": "openai/gpt-oss-20b:free",
+            "messages": [
+                {"role": "system", "content": "You are a helpful assistant for a chatbot MVP. Make short and helpful answers."},
+                {"role": "user", "content": user_text}
+            ],
+            "temperature": 0.7
+        })
 
-    response = requests.post(url, headers=headers, data=data)
+        response = requests.post(url, headers=headers, data=data)
 
-    data = response.json()
+        data = response.json()
 
-    if "choices" in data:
-        return data["choices"][0]["message"]["content"]
+        if "choices" in data:
+            return data["choices"][0]["message"]["content"]
 
-    return data.get("error", {}).get("message", "Unknown error")
+        return data.get("error", {}).get("message", "Unknown error")
+    
+    else:
+        return 'This is a test message, run the server with APP_ENV="prod" to perform real LLM calls.'
 
 
 @router.get("/messages")
