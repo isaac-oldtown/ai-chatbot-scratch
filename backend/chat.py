@@ -5,8 +5,8 @@ import requests
 from dotenv import load_dotenv
 from fastapi import APIRouter
 
-load_dotenv()
-OPENAI_KEY = os.getenv("OPENAI_KEY")
+load_dotenv(override=False)
+OPENAI_KEY, URL, MODEL = os.getenv('OPENAI_KEY'), os.getenv('URL', 'https://openrouter.ai/api/v1/chat/completions'), os.getenv('MODEL', 'openai/gpt-oss-20b:free')
 
 router = APIRouter()
 
@@ -15,20 +15,18 @@ messages = initial_message
 
 def generate_reply():
     if os.getenv('APP_ENV')=='prod':
-        url = "https://openrouter.ai/api/v1/chat/completions"
-
         headers = {
             "Authorization": f"Bearer {OPENAI_KEY}",
             "Content-Type": "application/json",
         }
 
         data = json.dumps({
-            "model": "openai/gpt-oss-20b:free",
+            "model": MODEL,
             "messages": messages,
             "temperature": 0.7,
         })
 
-        response = requests.post(url, headers=headers, data=data)
+        response = requests.post(URL, headers=headers, data=data)
 
         data = response.json()
 

@@ -30,7 +30,8 @@ ai-chatbot/
 │   └── styles.css
 ├── Dockerfile           # Docker build configuration
 ├── pyproject.toml       # Python project configuration
-└── .env                 # Contains an API key for cloud LLM (may or may not work)
+└── .env                 # Stores environment variables, details below
+                         # Also contains an API key for cloud LLM (may or may not work)
 ```
 
 ## Setup Instructions
@@ -46,9 +47,7 @@ cd ai-chatbot
 uv sync
 
 # Run backend server
-uv run uvicorn backend.main:app --reload  # Use APP_ENV='prod' to perform
-                                          # real LLM call, otherwise you'll 
-                                          # get a test message.
+uv run uvicorn backend.main:app --reload
 
 # Access http://localhost:8000/index/ from browser
 ```
@@ -65,10 +64,18 @@ cd ai-chatbot
 docker build -t ai-chatbot .
 
 # Run Docker container
-docker run -p 8000:8000 ai-chatbot  # Use -e APP_ENV='prod' to perform true LLM call, otherwise you'll get a test message.
+docker run -p 8000:8000 ai-chatbot
 
 # Access http://localhost:8000/index/ from browser
 ```
+
+### Environment variables :
+Both methods support the following environment variables:
+| Variable | Description                                                                              |
+| -------- | ---------------------------------------------------------------------------------------- |
+| `MODEL`  | the LLM used by the chatbot, defaults to `openai/gpt-oss-20b:free`                       |
+| `URL`    | the URL where `MODEL` lives, defaults to `https://openrouter.ai/api/v1/chat/completions` (should support any OpenAI-compatible API)|
+
 
 ## Planned Enhancements
 - **Database integration** for session persistence (PostgreSQL/Redis)
