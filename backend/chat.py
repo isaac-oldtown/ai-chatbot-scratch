@@ -10,9 +10,10 @@ OPENAI_KEY = os.getenv("OPENAI_KEY")
 
 router = APIRouter()
 
-messages = [
-    {"role": "bot", "text": "Hello 👋"}
+initial_message=[
+    {"role": "bot", "text": "Hello"}
 ]
+messages = initial_message
 
 def generate_reply(user_text: str):
     url = "https://openrouter.ai/api/v1/chat/completions"
@@ -58,5 +59,5 @@ def send_message(payload: dict):
 @router.delete("/messages/reset")
 def reset():
     global messages
-    messages = [{"role": "bot", "text": "Hello 👋"}]
+    messages = initial_message
     return {"status": "reset"}
