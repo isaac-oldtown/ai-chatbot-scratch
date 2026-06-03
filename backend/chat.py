@@ -10,12 +10,10 @@ OPENAI_KEY = os.getenv("OPENAI_KEY")
 
 router = APIRouter()
 
-initial_message=[
-    {"role": "bot", "text": "Hello"}
-]
+initial_message=[{"role": "system", "content": "You are a helpful assistant for a chatbot MVP. Make short and helpful answers."}]
 messages = initial_message
 
-def generate_reply(user_text: str):
+def generate_reply():
     if os.getenv('APP_ENV')=='prod':
         url = "https://openrouter.ai/api/v1/chat/completions"
 
@@ -26,11 +24,8 @@ def generate_reply(user_text: str):
 
         data = json.dumps({
             "model": "openai/gpt-oss-20b:free",
-            "messages": [
-                {"role": "system", "content": "You are a helpful assistant for a chatbot MVP. Make short and helpful answers."},
-                {"role": "user", "content": user_text}
-            ],
-            "temperature": 0.7
+            "messages": messages,
+            "temperature": 0.7,
         })
 
         response = requests.post(url, headers=headers, data=data)
@@ -43,7 +38,7 @@ def generate_reply(user_text: str):
         return data.get("error", {}).get("message", "Unknown error")
     
     else:
-        return 'This is a test message, run the server with APP_ENV="prod" to perform real LLM calls.'
+        return 'This is a test message, run the server with APP_ENV="prod" environment variable to perform real LLM calls.'
 
 
 @router.get("/messages")
@@ -54,9 +49,9 @@ def get_messages():
 def send_message(payload: dict):
     user_msg = payload.get("message")
 
-    messages.append({"role": "user", "text": user_msg})
-    reply = generate_reply(user_msg)
-    messages.append({"role": "bot", "text": reply})
+    messages.append({"role": "user", "content": user_msg})
+    reply = generate_reply()
+    messages.append({"role": "assistant", "content": reply})
 
     return {"reply": reply}
 
