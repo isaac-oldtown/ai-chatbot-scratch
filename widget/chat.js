@@ -1,5 +1,5 @@
 const API_URL = "http://127.0.0.1:8000/api";
-const initial_message = "Hello! I'm your AI assistant. How can I help you today?"
+const initial_message = "Hello! I'm your AI assistant. How can I help you today?" // UI-only message, not sent to the LLM.
 
 document.addEventListener('DOMContentLoaded', function() {
     const chatHistory = document.getElementById('chatHistory');
@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Show typing indicator
             const typingIndicator = document.createElement('div');
             typingIndicator.classList.add('message', 'ai-message');
-            typingIndicator.textContent = 'AI is typing. ..';
+            typingIndicator.textContent = 'AI is typing...';
             typingIndicator.id = 'typingIndicator';
             chatHistory.appendChild(typingIndicator);
             chatHistory.scrollTop = chatHistory.scrollHeight;
