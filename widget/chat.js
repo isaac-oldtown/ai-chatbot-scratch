@@ -1,4 +1,5 @@
 const API_URL = "http://127.0.0.1:8000/api";
+const initial_message = "Hello! I'm your AI assistant. How can I help you today?"
 
 document.addEventListener('DOMContentLoaded', function() {
     const chatHistory = document.getElementById('chatHistory');
@@ -8,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const tutorialPanel = document.getElementById('tutorialPanel');
     const togglePanel = document.getElementById('togglePanel');
     const closePanel = document.getElementById('closePanel');
+
 
     // Function to add a message to the chat
     function addMessage(message, isUser = false) {
@@ -74,6 +76,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     clearButton.addEventListener('click', function() {
         chatHistory.innerHTML = '';
+        addMessage(initial_message, false);
     });
 
     // Tutorial panel toggle functionality
@@ -89,6 +92,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Add initial welcome message
     setTimeout(() => {
-        addMessage("Hello! I'm your AI assistant. How can I help you today?", false);
+        addMessage(initial_message, false);
     }, 500);
 });
