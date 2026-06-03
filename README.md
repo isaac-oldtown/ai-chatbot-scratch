@@ -1,4 +1,12 @@
-## 🏗️ Tech Stack
+# AI Chatbot Interface
+
+A simple AI chatbot interface crafted for hands-on learning and exploration.
+
+## Key Features
+- Real-time chat interface with AI-powered responses
+- RESTful API for chat operations
+
+## Tech Stack
 **Backend:**
 - Python >= 3.11
 - FastAPI (Web framework)
@@ -9,17 +17,7 @@
 - HTML5
 - CSS
 
-**Future Integration Plans:**
-- Docker containerization
-- Database (for session storage)
-- RAG (Retrieval-Augmented Generation) for intelligent responses
-- Environment management
-
-## 🚀 Key Features
-- Real-time chat interface with AI-powered responses
-- RESTful API for chat operations
-
-## 📂 Project Structure
+## Project Structure
 ```
 ai-chatbot/
 ├── backend/
@@ -27,13 +25,15 @@ ai-chatbot/
 │   ├── main.py          # FastAPI application setup
 ├── widget/              # Frontend
 │   ├── index.html
+│   ├── sidebar.html
 │   ├── chat.js
 │   └── styles.css
+├── Dockerfile           # Docker build configuration
 ├── pyproject.toml       # Python project configuration
-└── .env                 # API key for cloud LLM, bound to a free model (may or may not work)
+└── .env                 # Contains an API key for cloud LLM (may or may not work)
 ```
 
-## 🔧 Setup Instructions
+## Setup Instructions
 ### Using Python
 ```bash
 # Clone the repository
@@ -46,7 +46,9 @@ cd ai-chatbot
 uv sync
 
 # Run backend server
-uv run uvicorn backend.main:app --reload  # Use APP_ENV='prod' to perform true LLM call, otherwise you'll get a test message.
+uv run uvicorn backend.main:app --reload  # Use APP_ENV='prod' to perform
+                                          # real LLM call, otherwise you'll 
+                                          # get a test message.
 
 # Access http://localhost:8000/index/ from browser
 ```
@@ -68,7 +70,7 @@ docker run -p 8000:8000 ai-chatbot  # Use -e APP_ENV='prod' to perform true LLM 
 # Access http://localhost:8000/index/ from browser
 ```
 
-## 🚧 Planned Enhancements
+## Planned Enhancements
 - **Database integration** for session persistence (PostgreSQL/Redis)
 - **RAG implementation** for context-aware responses
 - **User authentication** and session management
