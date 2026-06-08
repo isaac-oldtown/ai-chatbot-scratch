@@ -13,18 +13,25 @@ class Memory:
             os.getenv("MODEL", "openai/gpt-oss-20b:free"),
             os.getenv("APP_ENV", "prod")
         )
-
         # Default values
+        self.reset()
+    
+    def reset(self):
         self.INITIAL_MESSAGE = [
             {
                 "role": "system",
                 "content": """You are a helpful assistant for a chatbot MVP. Provide short, clear, and useful answers.
 When the user provides documents, treat them as the primary source of truth.
 If the answer can be found in a document, use it to respond, explicitly reference where it appears, and include a relevant quote from the text.""",
+            },
+            {
+                "role": "assistant",
+                "content": "Hello! I'm your AI assistant. How can I help you today?"
             }
         ]
         self.CHAT_HISTORY = self.INITIAL_MESSAGE
         self.RAW_DOCUMENTS = {}
         self.DOCUMENTS_TEXT = {}
+        return {' status': 'reset'}
 
 STATE = Memory()

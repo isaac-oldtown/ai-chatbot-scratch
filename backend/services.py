@@ -45,8 +45,7 @@ def send_message(payload: dict):
 
 
 def reset():
-    STATE.CHAT_HISTORY = STATE.INITIAL_MESSAGE
-    return {"status": "reset"}
+    return STATE.reset()
 
 
 # ================= DOCUMENT SERVICES ================= #

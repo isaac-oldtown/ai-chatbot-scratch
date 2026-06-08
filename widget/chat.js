@@ -1,6 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+    // =============== VARIABLES =============== //
     const API_URL = "http://localhost:8000/api";
-    const initial_message = "Hello! I'm your AI assistant. How can I help you today?" // UI-only message, not sent to the LLM.
 
     const chatHistory = document.getElementById('chatHistory');
     const userInput = document.getElementById('userInput');
@@ -12,6 +12,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const uploadButton = document.getElementById('uploadButton');
     const documentInput = document.getElementById('documentInput');
 
+
+    // =============== FUNCTIONS =============== //
     // Function to add a message to the chat
     function addMessage(text, isAI = false) {
         const messageDiv = document.createElement('div');
@@ -35,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function() {
     async function sendMessage() {
         const message = userInput.value.trim();
         if (message) {
-            addMessage(message, true);
+            addMessage(message, false);
             userInput.value = '';
             
             // Show typing indicator
@@ -61,21 +63,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Fixed: use 'reply' instead of 'response' to match your working FastAPI code
                 if (data && typeof data === 'object' && data.reply) {
-                    addMessage(data.reply, false);
+                    addMessage(data.reply, true);
                 } else {
                     // Fallback for different response structures
                     const responseText = data.reply || data.response || data.message || data.text || JSON.stringify(data);
-                    addMessage(responseText, false);
+                    addMessage(responseText, true);
                 }
             } catch (error) {
                 chatHistory.removeChild(typingIndicator);
-                addMessage("Sorry, I encountered an error. Please try again.", false);
+                addMessage("Sorry, I encountered an error. Please try again.", true);
                 console.error('Error:', error);
             }
         }
     }
 
-    // Event listeners
+    // =============== EVENT LISTENERS =============== //
     sendButton.addEventListener('click', sendMessage);
     
     userInput.addEventListener('keypress', function(e) {
@@ -84,9 +86,23 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 
-    clearButton.addEventListener('click', function() {
+    clearButton.addEventListener('click', async function () {
         chatHistory.innerHTML = '';
-        addMessage(initial_message, false);
+
+        try {
+            await fetch(`${API_URL}/chat/reset`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+
+            await loadChatHistory();
+
+        } catch (error) {
+            console.error('Failed to reset chat:', error);
+            addMessage('Failed to reset chat.', true);
+        }
     });
 
     // Tutorial panel toggle functionality
@@ -99,11 +115,6 @@ document.addEventListener('DOMContentLoaded', function() {
         tutorialPanel.classList.remove('active');
         togglePanel.textContent = '?';
     });
-
-    // Add initial welcome message
-    setTimeout(() => {
-        addMessage(initial_message, false);
-    }, 500);
 
     // File picker
     uploadButton.addEventListener('click', () => {
@@ -134,14 +145,14 @@ document.addEventListener('DOMContentLoaded', function() {
             chatHistory.removeChild(typingIndicator);
 
             if (body.error === 1) {
-                addMessage(body.text, false); // backend error
+                addMessage(body.text, true); // backend error
             } else if (body.error === 0) {
                 addMessage(
                     body.message || `📄 Uploaded: ${file.name}`,
-                    true
+                    false
                 );
             } else {
-                addMessage("Unexpected server response.", false);
+                addMessage("Unexpected server response.", true);
                 console.log(body.text);
             }
 
@@ -150,7 +161,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
             addMessage(
                 `Failed to upload document "${file.name}".`,
-                false
+                true
             );
 
             console.error(error);
@@ -159,4 +170,28 @@ document.addEventListener('DOMContentLoaded', function() {
         documentInput.value = '';
     });
 
+    // Show all messages
+    async function loadChatHistory() {
+        try {
+            const response = await fetch(`${API_URL}/chat`);
+            const messages = await response.json();
+
+            if (!Array.isArray(messages)) return;
+
+            messages.forEach(msg => {
+                // skip system messages
+                if (msg.role === "system") return;
+
+                const isAI = msg.role === "assistant";
+                addMessage(msg.content, isAI);
+            });
+
+        } catch (error) {
+            console.error("Failed to load chat history:", error);
+            addMessage("Failed to load chat history.", true);
+        }
+    }
+
+    // call it on page load
+    loadChatHistory();
 });
