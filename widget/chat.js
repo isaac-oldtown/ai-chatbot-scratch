@@ -1,7 +1,7 @@
-const API_URL = "http://127.0.0.1:8000/api";
-const initial_message = "Hello! I'm your AI assistant. How can I help you today?" // UI-only message, not sent to the LLM.
-
 document.addEventListener('DOMContentLoaded', function() {
+    const API_URL = "http://localhost:8000/api";
+    const initial_message = "Hello! I'm your AI assistant. How can I help you today?" // UI-only message, not sent to the LLM.
+
     const chatHistory = document.getElementById('chatHistory');
     const userInput = document.getElementById('userInput');
     const sendButton = document.getElementById('sendButton');
@@ -9,15 +9,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const tutorialPanel = document.getElementById('tutorialPanel');
     const togglePanel = document.getElementById('togglePanel');
     const closePanel = document.getElementById('closePanel');
-
+    const uploadButton = document.getElementById('uploadButton');
+    const documentInput = document.getElementById('documentInput');
 
     // Function to add a message to the chat
-    function addMessage(message, isUser = false) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message');
-        messageElement.classList.add(isUser ? 'user-message' : 'ai-message');
-        messageElement.textContent = message;
-        chatHistory.appendChild(messageElement);
+    function addMessage(text, isAI = false) {
+        const messageDiv = document.createElement('div');
+
+        messageDiv.classList.add('message');
+        messageDiv.classList.add(isAI ? 'ai-message' : 'user-message');
+
+        // Convert Markdown → HTML
+        const html = marked.parse(text || "");
+
+        // Sanitize HTML (prevents XSS attacks)
+        messageDiv.innerHTML = DOMPurify.sanitize(html);
+
+        chatHistory.appendChild(messageDiv);
+
+        // Optional: auto-scroll to bottom
         chatHistory.scrollTop = chatHistory.scrollHeight;
     }
 
@@ -38,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
                 // Send to cloud API using async/await
-                const response = await fetch(`${API_URL}/messages/send`, {
+                const response = await fetch(`${API_URL}/chat/send`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -94,4 +104,59 @@ document.addEventListener('DOMContentLoaded', function() {
     setTimeout(() => {
         addMessage(initial_message, false);
     }, 500);
+
+    // File picker
+    uploadButton.addEventListener('click', () => {
+        documentInput.click();
+    });
+
+    documentInput.addEventListener('change', async function () {
+        const file = this.files[0];
+
+        if (!file) return;
+
+        const typingIndicator = document.createElement('div');
+        typingIndicator.classList.add('message', 'ai-message');
+        typingIndicator.textContent = 'Uploading document...';
+        chatHistory.appendChild(typingIndicator);
+
+        try {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const response = await fetch(`${API_URL}/documents/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            const body = await response.json();
+
+            chatHistory.removeChild(typingIndicator);
+
+            if (body.error === 1) {
+                addMessage(body.text, false); // backend error
+            } else if (body.error === 0) {
+                addMessage(
+                    body.message || `📄 Uploaded: ${file.name}`,
+                    true
+                );
+            } else {
+                addMessage("Unexpected server response.", false);
+                console.log(body.text);
+            }
+
+        } catch (error) {
+            chatHistory.removeChild(typingIndicator);
+
+            addMessage(
+                `Failed to upload document "${file.name}".`,
+                false
+            );
+
+            console.error(error);
+        }
+
+        documentInput.value = '';
+    });
+
 });
