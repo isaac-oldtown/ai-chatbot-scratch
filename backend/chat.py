@@ -14,7 +14,9 @@ initial_message=[{"role": "system", "content": "You are a helpful assistant for 
 messages = initial_message
 
 def generate_reply():
-    if os.getenv('APP_ENV')=='prod':
+    if os.getenv('APP_ENV')=='test':
+        return 'This is a test message, run the server with APP_ENV="prod" environment variable to perform real LLM calls.'
+    else:
         headers = {
             "Authorization": f"Bearer {OPENAI_KEY}",
             "Content-Type": "application/json",
@@ -34,10 +36,6 @@ def generate_reply():
             return data["choices"][0]["message"]["content"]
 
         return data.get("error", {}).get("message", "Unknown error")
-    
-    else:
-        return 'This is a test message, run the server with APP_ENV="prod" environment variable to perform real LLM calls.'
-
 
 @router.get("/messages")
 def get_messages():

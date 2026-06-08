@@ -47,7 +47,7 @@ cd ai-chatbot
 uv sync
 
 # Run backend server
-uv run uvicorn backend.main:app --reload
+uv run uvicorn backend.main:app --reload    # See useful env variables below
 
 # Access http://localhost:8000/index/ from browser
 ```
@@ -64,7 +64,7 @@ cd ai-chatbot
 docker build -t ai-chatbot .
 
 # Run Docker container
-docker run -p 8000:8000 ai-chatbot
+docker run -p 8000:8000 ai-chatbot  # See useful env variables below
 
 # Access http://localhost:8000/index/ from browser
 ```
@@ -73,6 +73,7 @@ docker run -p 8000:8000 ai-chatbot
 Both methods support the following environment variables:
 | Variable | Description                                                                              |
 | -------- | ---------------------------------------------------------------------------------------- |
+| `APP_ENV`| Set to `'test'` to get test messages, else, you'll perform a real API call to the `MODEL`|
 | `MODEL`  | the LLM used by the chatbot, defaults to `openai/gpt-oss-20b:free`                       |
 | `URL`    | the URL where `MODEL` lives, defaults to `https://openrouter.ai/api/v1/chat/completions` (should support any OpenAI-compatible API)|
 
