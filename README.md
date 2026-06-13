@@ -70,7 +70,7 @@ docker run -p 8000:8000 ai-chatbot  # See useful env variables below
 ```
 
 ### Environment variables :
-Both methods support the following environment variables:
+Both setup methods support the following environment variables:
 | Variable | Description                                                                              |
 | -------- | ---------------------------------------------------------------------------------------- |
 | `APP_ENV`| Set to `'test'` to get test messages, else, you'll perform a real API call to the `MODEL`|
